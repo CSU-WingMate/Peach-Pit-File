@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+
+	<DataModel name="HttpRequest">
+		<Block name="RequestLine">
+			<String value="GET" />
+			<String value=" " token="true" mutable="false" />
+			<String value="/" token="true" mutable="false" />
+			<String value="?" token="true" mutable="false" />
+			<Block name="Parameter">
+				<String value="name" />
+				<String value="=" token="true" />
+				<String value="value" />
+				<String value="&" token="true" />
+			</Block>
+			<String value=" " token="true" mutable="false" />
+			<String value="HTTP/1.0" />
+			<String value="\r\n" token="true" mutable="false" />
+		</Block>
+		<String value="\r\n" token="true" mutable="false" />
+	</DataModel>
+	
+	<StateModel name="TheStateModel" initialState="TheState">
+		<State name="TheState">
+			<Action type="output">
+				<DataModel ref="HttpRequest" />
+			</Action>
+		</State>
+	</StateModel>
+
+	<!-- Agents that run localy will be started automatically by Peach -->
+	<Agent name="RemoteAgent" location="tcp://192.168.1.6:9001">
+		<Monitor name="Debugger" class="WindowsDebugger">
+			<Param name="CommandLine" value="C:\Users\dmk\Downloads\tightvnc-1.3.10_winsrc\vnc_winsrc\winvnc\Debug\WinVNC.exe -run -silent"/>
+			<Param name="WinDbgPath" value="C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\" />
+		</Monitor>
+	</Agent>
+
+	<Test name="Default">
+		<Agent ref="RemoteAgent" />
+		<StateModel ref="TheStateModel"/>
+
+		<Publisher class="TcpClient">
+			<Param name="Host" value="192.168.1.6" />
+			<Param name="Port" value="5800" />
+		</Publisher>
+		
+		<Logger class="Filesystem">
+			<Param name="Path" value="Logs" />
+		</Logger>
+	</Test>
+
+</Peach>
+<!-- end -->

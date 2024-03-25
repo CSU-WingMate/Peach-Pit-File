@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+
+    <!-- 默认配置 -->
+    <Defaults>
+        <Number endian="big" />
+    </Defaults>
+
+    <!-- 定义数据模型 -->
+    <DataModel name="Header">
+        <Number name="ID" size="16" value="1234"/>
+        <Number name="QR" size="1"  mutable="false"/>
+        <Number name="Opcode" size="4"  mutable="false"/>
+        <Number name="AA" size="1"  mutable="false"/>
+        <Number name="TC" size="1"  mutable="false"/>
+        <Number name="RD" size="1" value="1"  mutable="false"/>
+        <Number name="RA" size="1"  mutable="false"/>
+        <Number name="Z" size="3"  mutable="false"/>
+        <Number name="RCODE" size="4"  mutable="false"/>
+        <Number name="QDCOUNT" size="16" mutable="false"/>
+        <Number name="ANCOUNT" size="16"  mutable="false"/>
+        <Number name="NSCOUNT" size="16"  mutable="false"/>
+        <Number name="ARCOUNT" size="16" mutable="false" />
+    </DataModel>
+
+    <DataModel name="Label">
+        <Number name="flag" size="2" value="0" mutable="false"/>
+        <Number name="size" size="6">
+        <Relation type="size" of="id"/>
+        </Number>
+        <String name="id" nullTerminated="false"/>
+    </DataModel>
+
+    <DataModel name="Labels">
+        <Block ref="Label" occurs="1">
+            <String name="id" value="www" nullTerminated="false"/>
+        </Block>
+        <Block ref="Label" occurs="1">
+            <String name="id" value="google" nullTerminated="false"/>
+        </Block>
+        <Block ref="Label" occurs="1">
+            <String name="id" value="com" nullTerminated="false"/>
+        </Block>
+    </DataModel>
+
+    <DataModel name="QNAME">
+        <Choice>
+            <Block ref="Labels">
+                <Blob name="NULL" length="1" valueType="hex" mutable="false" value="00"/>
+            </Block>
+            <Block ref="Labels">
+                <Number name="flag" value="3" size="2" mutable="false"/>
+                <Number size="14"/>
+            </Block>
+            <Block>
+                <Number name="flag" value="3" size="2" mutable="false"/>
+                <Number size="14"/>
+            </Block>
+        </Choice>
+    </DataModel>
+
+    <DataModel name="DNS" ref="Header">
+        <Number name="QDCOUNT" size="16" mutable="true">
+            <Relation type="count" of="Query"/>
+        </Number>
+        <Block name="Query" ref="QNAME" maxOccurs="10">
+            <Number name="QTYPE" size="16" valueType="hex" mutable="false" value="00 01"/>
+            <Number name="QCLASS" size="16" valueType="hex" mutable="false" value="00 01"/>
+        </Block>
+    </DataModel>
+
+    <!-- 定义状态模型 initialState表示初始状态 -->
+    <StateModel name="State" initialState="State1" >
+        <!-- 定义状态 -->
+        <State name="State1"  >
+            <!-- 具体动作，output表示外发数据 -->
+            <Action type="output" >
+                <DataModel ref="DNS"/>
+            </Action>
+        </State>
+    </StateModel>
+
+    <!-- Monitor -->
+    <Agent name="TheAgent">
+        <Monitor class="RunCommand">
+            <Param name="Command" value="python3"/>
+            <Param name="Arguments" value="./pits/monitor.py" />
+            <Param name="FaultOnNonZeroExit" value="true" />
+            <Param name="When" value="OnIterationEnd" />
+        </Monitor>
+    </Agent>
+
+    <!-- 设置maxOutputSize以防止产生过大数据包 -->
+    <Test name="Default" maxOutputSize="100000" >
+        <!-- 变异策略 -->
+        <Strategy class="Random">
+            <Param name="MaxFieldsToMutate" value="6" />
+            <Param name="SwitchCount" value="200" />
+        </Strategy>
+        <Mutators mode="exclude">
+            <Mutator class="DataElementDuplicate"/>
+            <Mutator class="DataElementRemove"/>
+            <Mutator class="DataElementSwapNearNodes"/>
+            <Mutator class="DataElementSwapNear"/>
+        </Mutators>
+        <!-- 指定要使用的状态模型 -->
+        <StateModel ref="State"/>
+        <!-- 指定Publisher -->
+        <Publisher class="Udp">
+            <Param name="Host" value="8.8.8.8"/>
+            <Param name="Port" value="53" />
+        </Publisher>
+        <Agent ref="TheAgent"/>
+    </Test>
+</Peach>
+
+
+
+

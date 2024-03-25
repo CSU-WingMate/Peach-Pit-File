@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+
+<Include ns="ftp" src="/opt/xml/ftp/ftp_data.xml" />
+
+<StateModel name="FTPModel" initialState="init">
+        <State name="init">
+                <Action type="input">
+                        <DataModel ref="ftp:Init" />
+                </Action>
+                <Action type="changeState" ref="user" />
+        </State>
+        <State name="user">
+                <Action type="output">
+                        <DataModel ref="ftp:User" />
+                </Action>
+                <Action type="input">
+                        <DataModel ref="ftp:ReUser" />
+                </Action>
+                <Action type="changeState" ref="pass" />
+        </State>
+        <State name="pass">
+                <Action type="output">
+                        <DataModel ref="ftp:Pass" />
+                </Action>
+                <Action type="input">
+                        <DataModel ref="ftp:RePass" />
+                </Action>
+                <Action type="changeState" ref="quit" />
+        </State>
+        <State name="quit">
+                <Action type="output">
+                        <DataModel ref="ftp:Quit" />
+                </Action>
+                <Action type="input">
+                        <DataModel ref="ftp:ReQuit" />
+                </Action>
+        </State>
+</StateModel>
+
+<Agent name="LocalAgent" >
+        <Monitor class="Process">
+                <Param name="Executable" value="/opt/pyftpdlib-master/demo/basic_ftpd.py" />
+                <Param name="Faultonearlyexit" value="true" />
+        </Monitor>
+</Agent>
+
+<Test name="Default" replayEnabled="false">
+        <Agent ref="LocalAgent" platform="linux"/> 
+        <StateModel ref="FTPModel"/>
+
+        <Publisher class="Remote">
+                <Param name="Agent" value="LocalAgent" />
+                <Param name="Class" value="TcpClient" />
+                <Param name="Host" value="172.0.0.1" />
+                <Param name="SrcPort" value="43222" />
+                <Param name="Port" value="2122" />
+        </Publisher>
+</Test>
+
+</Peach>
