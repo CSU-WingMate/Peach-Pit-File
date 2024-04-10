@@ -1,0 +1,71 @@
+<Peach x
+<?xml vers<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+
+
+
+<DataModel name="CoAP_Message">
+  	<!--CoAP协议版本号-->
+	<Number name="Ver" size="2" signed="false" mutable="false">
+	<!--CoAP报文类型-->
+	<Number name="Type" size="2" signed="false" mutable="false">
+	<!--CoAP标识符长度-->
+	<Number name="TKL" size="4" signed="false" mutable="false">
+	<!--指示CoAP协议的功能码/响应码-->
+	<Number name="Code" size="8" signed="false" mutable="false">
+	<!--CoAP报文编号-->
+	<Number name="Message_ID" length="2" signed="false" mutable="false">
+	<!--标识符具体内容-->
+	<Number name="Token" signed="false" mutable="false">
+	<!--Optins-->
+	<Number name="Options" signed="false" mutable="false">
+	<!--PayLoad Maker-->
+	<Number name="PM" size="8" value="FF" valueType="hex" signed="false" mutable="false">
+	<!--PayLoad，携带应用层的数据-->
+	<Number name="PayLoad" signed="false" mutable="false">
+</DataModel>
+
+
+
+
+<StateModel name="TheState" initialState="initialState">
+	<State name="reliable_transmission">
+		<Action type="output">
+				<DataModel ref="CoAP_Message"/>
+		</Action>
+		<Action type="input">
+				<DataModel ref="CoAP_Message"/>
+		</Action>
+	</State>
+
+	<State name="unreliable_transmission">
+		<Action type="output">
+				<DataModel ref="CoAP_Message"/>
+		</Action>
+	</State>
+</StateModel>
+
+
+
+<!--使用socket进行监听端口-->
+<Agent name="Local">
+	<Monitor class="Socket">
+		<Param name="Host" value="127.0.0.1"/>
+		<Param name="port" value="502"/>
+	</Monitor>
+</Agent>
+
+<!--log保存-->
+<Test name="Default">
+	<Agent ref="Local"/>
+	<StateModel ref="TheState"/>
+	<Logger class="File">
+		<Param name="Path" value="C:\peach\logs"/>
+	</Logger>
+	<Publisher class="tcp.Tcp">
+		<Param name="Host" value="127.0.0.1"/>
+		<Param name="Port" value="502"/>
+	</Publisher>
+</Test>
+</Peach>

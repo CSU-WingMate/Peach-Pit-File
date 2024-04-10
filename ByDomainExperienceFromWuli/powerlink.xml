@@ -1,0 +1,274 @@
+<Peach x
+<?xml vers<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+
+<DataModel name="SoC">
+<!--目标节点物理地址（Destination MAC Address）-->
+<Number name="dmac" length="6"  valueType="hex" signed="false" mutable="false"/>
+<!--源节点物理地址（Source MAC Address）-->
+<Number name="smac" length="6"  valueType="hex" signed="false" mutable="false"/>
+<!--Ethernet message type-->
+<Number name="etyp" length="2" valueType="hex" signed="false" mutable="false"/>
+<!--reserved-->
+<Number name="res" size="1"  valueType="hex" signed="false" mutable="false"/>
+<!--PowerLink message type identification-->
+<Number name="mtyp" size="7"  valueType="hex" signed="false" mutable="false"/>
+<!--PowerLink Node ID of the addressed node-->
+<Number name="dest" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--PowerLink Node ID of the transmitting node-->
+<Number name="src" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--reserved-->
+<Number name="res" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--Multiplexed Cycle Flag:当最后的多路复用周期结束时将被切换-->
+<Number name="MC" size="1"  valueType="hex" signed="false" mutable="false"/>
+<!--Prescaled Signal Flag:每经过n个周期后被MN切换-->
+<Number name="PS" size="1"  valueType="hex" signed="false" mutable="false"/>
+<!--reserved-->
+<Number name="res" size="14"  valueType="hex" signed="false" mutable="false"/>
+
+<Choice name="Choice1">
+	
+<Block name="Type1">
+<!--NetTime, PowerLink周期的开始时间-->
+<Number name="time" length="8" valueType="hex" signed="false" mutable="false"/>
+</Block>
+<Block name="Type2">
+<!--reserved-->
+<Number name="res" length="8" valueType="hex" signed="false" mutable="false"/>
+</Block>
+</Choice>
+
+<Choice name="Choice2">
+<Block name="Type1">
+<!--RelativeTime, PowerLink周期的相对时间-->
+<Number name="reltime" length="8" valueType="hex" signed="false" mutable="false"/>
+</Block>
+<Block name="Type2">
+<!--reserved-->
+<Number name="res" length="8" valueType="hex" signed="false" mutable="false"/>
+</Block>
+</Choice>
+
+<!--reserved-->
+<Number name="res" length="24"  valueType="hex" signed="false" mutable="false"/>
+<!--CRC32冗余和校验-->
+<Number name="crc" length="4" valueType="hex" signed="false" mutable="false"/>
+</DataModel>
+
+
+
+<DataModel name="PReq">
+<!--目标节点物理地址（Destination MAC Address）-->
+<Number name="dmac" length="6"  valueType="hex" signed="false" mutable="false"/>
+<!--源节点物理地址（Source MAC Address）-->
+<Number name="smac" length="6"  valueType="hex" signed="false" mutable="false"/>
+<!--Ethernet message type-->
+<Number name="etyp" length="2" valueType="hex" signed="false" mutable="false"/>
+<!--reserved-->
+<Number name="res" size="1"  valueType="hex" signed="false" mutable="false"/>
+<!--PowerLink message type identification-->
+<Number name="mtyp" size="7"  valueType="hex" signed="false" mutable="false"/>
+<!--PowerLink Node ID of the addressed node-->
+<Number name="dest" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--PowerLink Node ID of the transmitting node-->
+<Number name="src" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--reserved-->
+<Number name="res" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--reserved-->
+<Number name="res" size="2"  valueType="hex" signed="false" mutable="false"/>
+<!--Multiplexed Slot Flag:标记采用复用时隙服务的CNs-->
+<Number name="MS" size="1"  valueType="hex" signed="false" mutable="false"/>
+<!--reserved-->
+<Number name="res" size="2"  valueType="hex" signed="false" mutable="false"/>
+<!--Exception Acknowledge:错误信号-->
+<Number name="EA" size="1"  valueType="hex" signed="false" mutable="false"/>
+<!--reserved-->
+<Number name="res" size="1"  valueType="hex" signed="false" mutable="false"/>
+<!--Ready Flag：如果传输的载荷数据是有效的，	MN则应设置它，一个CN只有在此位被设置时才允许接受数据。-->
+<Number name="RD" size="1"  valueType="hex" signed="false" mutable="false"/>
+
+<!--reserved-->
+<Number name="res" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--PDO Version，指明负载数据的PDO编码版本-->
+<Number name="pdov" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--reserved-->
+<Number name="res" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--Size，指明负载数据的数量/大小-->
+<Number name="size" length="2"  valueType="hex" signed="false" mutable="false"/>
+<!--Payload，从MN发送到CN的等时荷载数据--> 
+<Number name="pl" valueType="hex" signed="false" mutable="false"/>
+<!--CRC32冗余和校验-->
+<Number name="crc" length="4" valueType="hex" signed="false" mutable="false"/>
+</DataModel>
+
+
+<DataModel name="PRes">
+<!--目标节点物理地址（Destination MAC Address）-->
+<Number name="dmac" length="6"  valueType="hex" signed="false" mutable="false"/>
+<!--源节点物理地址（Source MAC Address）-->
+<Number name="smac" length="6"  valueType="hex" signed="false" mutable="false"/>
+<!--Ethernet message type-->
+<Number name="etyp" length="2" valueType="hex" signed="false" mutable="false"/>
+<!--reserved-->
+<Number name="res" size="1"  valueType="hex" signed="false" mutable="false"/>
+<!--PowerLink message type identification-->
+<Number name="mtyp" size="7"  valueType="hex" signed="false" mutable="false"/>
+<!--PowerLink Node ID of the addressed node-->
+<Number name="dest" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--PowerLink Node ID of the transmitting node-->
+<Number name="src" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--NMTState，应报告现在的CN所处NMT 状态机的阶段-->
+<Number name="stat" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--reserved-->
+<Number name="res" size="2"  valueType="hex" signed="false" mutable="false"/>
+<!--Multiplexed Slot Flag:标记采用复用时隙服务的CNs-->
+<Number name="MS" size="1"  valueType="hex" signed="false" mutable="false"/>
+<!--Exception New Flag:错误信号-->
+<Number name="EN" size="1"  valueType="hex" signed="false" mutable="false"/>
+<!--reserved-->
+<Number name="res" size="3"  valueType="hex" signed="false" mutable="false"/>
+<!--Ready Flag：如果传输的载荷数据是有效的，	MN则应设置它，所有其他CN和MN只有在此位被设置时才允许接受数据。-->
+<Number name="RD" size="1"  valueType="hex" signed="false" mutable="false"/>
+<!--reserved-->
+<Number name="res" size="2"  valueType="hex" signed="false" mutable="false"/>
+<!--Priority Flags: 指示异步发送队列中具有最高优先级的帧的优先级-->
+<Number name="PR" size="3"  valueType="hex" signed="false" mutable="false"/>
+<!--RequestToSend Flags: 指示节点上异步发送队列中挂起的帧数-->
+<Number name="RS" size="3"  valueType="hex" signed="false" mutable="false"/>
+<!--PDO Version，指明负载数据的PDO编码版本-->
+<Number name="pdov" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--reserved-->
+<Number name="res" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--Size，指明负载数据的数量/大小-->
+<Number name="size" length="2"  valueType="hex" signed="false" mutable="false"/>
+<!--Payload，从MN发送到CN的等时荷载数据--> 
+<Number name="pl" valueType="hex" signed="false" mutable="false"/>
+<!--CRC32冗余和校验-->
+<Number name="crc" length="4" valueType="hex" signed="false" mutable="false"/>
+</DataModel>
+
+
+
+
+<DataModel name="SoA">
+<!--目标节点物理地址（Destination MAC Address）-->
+<Number name="dmac" length="6"  valueType="hex" signed="false" mutable="false"/>
+<!--源节点物理地址（Source MAC Address）-->
+<Number name="smac" length="6"  valueType="hex" signed="false" mutable="false"/>
+<!--Ethernet message type-->
+<Number name="etyp" length="2" valueType="hex" signed="false" mutable="false"/>
+<!--reserved-->
+<Number name="res" size="1"  valueType="hex" signed="false" mutable="false"/>
+<!--PowerLink message type identification-->
+<Number name="mtyp" size="7"  valueType="hex" signed="false" mutable="false"/>
+<!--PowerLink Node ID of the addressed node-->
+<Number name="dest" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--PowerLink Node ID of the transmitting node-->
+<Number name="src" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--NMTState，应报告现在的CN所处NMT 状态机的阶段-->
+<Number name="stat" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--reserved-->
+<Number name="res" size="5"  valueType="hex" signed="false" mutable="false"/>
+
+<Choice name="Choice1">
+<Block name="Type1">
+<!--Exception Acknowledge:错误信号-->
+<Number name="EA" size="1"  valueType="hex" signed="false" mutable="false"/>
+</Block>
+<Block name="Type2">
+<!--reserved-->
+<Number name="res" size="1"  valueType="hex" signed="false" mutable="false"/>
+</Block>
+</Choice>
+
+<Choice name="Choice2">
+<Block name="Type1">
+<!--Exception Reset:错误信号-->
+<Number name="ER" size="1"  valueType="hex" signed="false" mutable="false"/>
+</Block>
+<Block name="Type2">
+<!--reserved-->
+<Number name="res" size="1"  valueType="hex" signed="false" mutable="false"/>
+</Block>
+</Choice>
+
+<!--reserved-->
+<Number name="res" size="9"  valueType="hex" signed="false" mutable="false"/>
+<!--RequestedServiceID，指示已授予的专用于SoA和接下来异步时隙的异步服务-->
+<Number name="svid" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--RequestedServiceTarget: 指明允许发送的节点的Powerlink地址-->
+<Number name="svtg" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--EPLVersion, 指明MN的当前Powerlink版本-->
+<Number name="eplv" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--CRC32冗余和校验-->
+<Number name="crc" length="4" valueType="hex" signed="false" mutable="false"/>
+</DataModel>
+
+
+<DataModel name="ASnd">
+<!--目标节点物理地址（Destination MAC Address-->
+<Number name="dmac" length="6"  valueType="hex" signed="false" mutable="false"/>
+<!--源节点物理地址（Source MAC Address）-->
+<Number name="smac" length="6"  valueType="hex" signed="false" mutable="false"/>
+<!--Ethernet message type-->
+<Number name="etyp" length="2" valueType="hex" signed="false" mutable="false"/>
+<!--reserved-->
+<Number name="res" size="1"  valueType="hex" signed="false" mutable="false"/>
+<!--PowerLink message type identification-->
+<Number name="mtyp" size="7"  valueType="hex" signed="false" mutable="false"/>
+<!--PowerLink Node ID of the addressed node-->
+<Number name="dest" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--PowerLink Node ID of the transmitting node-->
+<Number name="src" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--Service ID，指示专用于异步时隙的服务ID-->
+<Number name="svid" length="1"  valueType="hex" signed="false" mutable="false"/>
+<!--Payload，包含特定于当前服务ID的数据。--> 
+<Number name="pl" valueType="hex" signed="false" mutable="false"/>
+<!--CRC32冗余和校验-->
+<Number name="crc" length="4" valueType="hex" signed="false" mutable="false"/>
+</DataModel>
+
+<StateModel name="TheState" initialState="Isochronous_Phase">
+<State name="Isochronous_Phase">
+<Action type="output">
+      			<DataModel ref="SoC" />
+</Action>
+<Action type="output">
+      			<DataModel ref="PReq" />
+</Action>
+<Action type="input">
+      			<DataModel ref="PRes" />
+</Action>
+  </State>
+
+<State name="Asynchronous_Phase">
+<Action type="output">
+      			<DataModel ref="SoA" />
+</Action>
+<Action type="input">
+      			<DataModel ref="ASnd" />
+</Action>
+  </State>
+</StateModel>
+
+<!--使用socket进行监听端口 -->
+<Agent name="Local">
+ <Monitor class="Socket">
+  <Param name="Host" value="127.0.0.1" />
+  <Param name="port" value="502" />
+ </Monitor>
+</Agent>
+<!--log保存-->
+<Test name="Default">
+ <Agent ref="Local" />
+ <StateModel ref="TheState" />
+ <Logger class="File">
+  <Param name="Path" value="C:\peach\logs" />
+ </Logger>
+ <Publisher class="tcp.Tcp">
+  <Param name="Host" value="127.0.0.1" />
+  <Param name="Port" value="502" /> 
+ </Publisher>
+</Test>
+</Peach>

@@ -1,0 +1,112 @@
+<?xml vers<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+
+<DataModel name="Devicenetframe1"> // DeviceNet协议的数据帧
+<Number size="1" signed="false" name="SOF" valueType="hex">//帧起始
+<Block name="Identifier">
+<Number size="1" signed="false" name="Identifier" valueType="hex" value="0">
+<Number size="4" signed="false" name="Messageid1" valueType="hex">
+<Number size="6" signed="false" name="Sourcemacid" valueType="hex">
+</Block>
+<Number size="6" signed="false" name="Control" valueType="hex">//控制段
+<Block name="Data ">
+<Blob name="Data"  valueType="hex"> //长度不确定
+</Block>
+<Number size="16" signed="false" name="CRC" valueType="hex">//CRC段
+<Number size="2" signed="false" name="ACK" valueType="hex">//ACK段
+<Number size="7" signed="false" name="EOF" valueType="hex">//帧结束段
+</DataModel>\
+
+<DataModel name="Devicenetframe2"> // DeviceNet协议的数据帧
+<Number size="1" signed="false" name="SOF" valueType="hex">//帧起始
+<Block name="Identifier">
+<Number size="2" signed="false" name="Identifier" valueType="hex" value="2">
+<Number size="6" signed="false" name="macid" valueType="hex">
+<Number size="3" signed="false" name=" Messageid2" valueType="hex">
+</Block>
+<Number size="6" signed="false" name="Control" valueType="hex">//控制段
+<Block name="Data ">
+<Blob name="Data"  valueType="hex"> //长度不确定
+</Block>
+<Number size="16" signed="false" name="CRC" valueType="hex">//CRC段
+<Number size="2" signed="false" name="ACK" valueType="hex">//ACK段
+<Number size="7" signed="false" name="EOF" valueType="hex">//帧结束段
+</DataModel>
+
+<DataModel name="Devicenetframe3"> // DeviceNet协议的数据帧
+<Number size="1" signed="false" name="SOF" valueType="hex">//帧起始
+<Block name="Identifier">
+<Number size="2" signed="false" name="Identifier" valueType="hex" value="3">
+<Number size="4" signed="false" name=" Messageid3" valueType="hex">
+<Number size="3" signed="false" name=" Sourcemacid " valueType="hex">
+</Block>
+<Number size="6" signed="false" name="Control" valueType="hex">//控制段
+<Block name="Data ">
+<Blob name="Data"  valueType="hex"> //长度不确定
+</Block>
+<Number size="16" signed="false" name="CRC" valueType="hex">//CRC段
+<Number size="2" signed="false" name="ACK" valueType="hex">//ACK段
+<Number size="7" signed="false" name="EOF" valueType="hex">//帧结束段
+</DataModel>
+
+<DataModel name="Devicenetframe4"> // DeviceNet协议的数据帧
+<Number size="1" signed="false" name="SOF" valueType="hex">//帧起始
+<Block name="Identifier">
+<Number size="5" signed="false" name="Identifier" valueType="hex" value="31">
+<Number size="6" signed="false" name=" Messageid4" valueType="hex">
+</Block>
+<Number size="6" signed="false" name="Control" valueType="hex">//控制段
+<Block name="Data ">
+<Blob name="Data"  valueType="hex"> //长度不确定
+</Block>
+<Number size="16" signed="false" name="CRC" valueType="hex">//CRC段
+<Number size="2" signed="false" name="ACK" valueType="hex">//ACK段
+<Number size="7" signed="false" name="EOF" valueType="hex">//帧结束段
+</DataModel>
+
+
+<StateModel name="TheState" initialState="initialState">
+<State name="IOState">
+<Action type="output">
+<DataModel ref=" Devicenetframe1" />// 或者Devicenetframe2，Devicenetframe3
+</Action>
+</State>
+<State name="explicitState">
+<Action type="output">
+<DataModel ref=" Devicenetframe1" />// 或者Devicenetframe2，Devicenetframe3
+</Action>
+<Action type="input">
+<DataModel ref=" Devicenetframe1" />
+</Action>
+</State>
+<State name="offlineState">
+<Action type="output">
+<DataModel ref=" Devicenetframe4" />
+</Action>
+<Action type="input">
+<DataModel ref=" Devicenetframe4" />
+</Action>
+</State>
+</StateModel>
+
+ <!--使用socket进行监听端口 -->
+ <Agent name="Local">
+  <Monitor class="Socket">
+   <Param name="Host" value="127.0.0.1" />
+   <Param name="port" value="502" />
+  </Monitor>
+ </Agent>
+ <!--log保存-->
+ <Test name="Default">
+  <Agent ref="Local" />
+  <StateModel ref="TheState" />
+  <Logger class="File">
+   <Param name="Path" value="C:\peach\logs" />
+  </Logger>
+  <Publisher class="tcp.Tcp">
+   <Param name="Host" value="127.0.0.1" />
+   <Param name="Port" value="502" /> 
+  </Publisher>
+ </Test>
+</Peach>

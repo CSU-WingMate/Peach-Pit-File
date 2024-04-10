@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+<DataModel name="U_message">
+	<Blob name="Startcharacter" value="68" valueType="hex"/>
+	<Blob name="APDUlength" value="00" valueType="hex"/>
+	<Blob name="Control1" value="00" valueType="hex"/>
+	<Blob name="Control2" value="00" valueType="hex"/>
+	<Blob name="Control3" value="00" valueType="hex"/>
+	<Blob name="Control4" value="00" valueType="hex"/>
+	<Blob name="Control4" value="00" valueType="hex"/>
+</DataModel
+<DataModel name="S_message">
+	<Blob name="Startcharacter" value="68" valueType="hex"/>
+	<Blob name="APDUlength" value="00" valueType="hex"/>
+	<Blob name="Control1" value="00" valueType="hex"/>
+	<Blob name="Control2" value="00" valueType="hex"/>
+	<Blob name="Control3" value="00" valueType="hex"/>
+	<Blob name="Control4" value="00" valueType="hex"/>
+	<Blob name="Control4" value="00" valueType="hex"/>
+</DataModel>
+<DataModel name="I_message">
+	<DataModel ref="U_message"/>
+	<Blob name="TYP" value="00" valueType="hex"/>
+	<Blob name="VSQ" value="00" valueType="hex"/>
+	<Blob name="COT" value="00" valueType="hex"/>
+	<Blob name="ADR" value="00" valueType="hex"/>
+	<Blob name="informosomes" value="00 00 00 00 00" valueType="hex"/>
+</DataModel>
+
+<StateModel name="TheState" initialState="initialState">
+	<State name="initialState">
+		<Action type="output">
+			<DataModel ref="U_message">
+		</Action>
+		<Action type="input">
+			<DataModel ref="U_message">
+		</Action>
+		<Action type="changeState" ref="totalSummons">
+	</State>
+	<State name="totalSummons">
+		<Action type="I_output">
+			<DataModel ref="message">
+		</Action>
+		<Action type="input">
+			<DataModel ref="I_message">
+		</Action>
+		<Action type="changeState" ref="dataUpload">
+	</State>
+	<State name="dataUpload">
+		<Action type="input">
+			<DataModel ref="I_message">
+		</Action>
+		<Action type="output">
+			<DataModel ref="S_message">
+		</Action>	
+	</State>
+</StateModel>
+
+
+
+  <!--使用socket进行监听端口 -->
+ <Agent name="Local">
+  <Monitor class="Socket">
+   <Param name="Host" value="127.0.0.1" />
+   <Param name="port" value="502" />
+  </Monitor>
+ </Agent>
+
+ <!--log保存-->
+ <Test name="Default">
+  <Agent ref="Local" />
+  <StateModel ref="TheState" />
+  <Logger class="File">
+   <Param name="Path" value="C:\peach\logs" />
+  </Logger>
+
+  <Publisher class="tcp.Tcp">
+   <Param name="Host" value="127.0.0.1" />
+   <Param name="Port" value="502" /> 
+  </Publisher>
+
+ </Test>
+</Peach>

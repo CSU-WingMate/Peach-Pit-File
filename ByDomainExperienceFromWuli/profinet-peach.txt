@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach>
+    <!-- Ethernet 头-->
+    <DataModel name="EthernetHeader">
+        <Blob name="DestinationMAC" length="6"/>
+        <Blob name="SourceMAC" length="6"/>
+        <Number name="EtherType" size="16" value="0x8892" endian="big"/>
+    </DataModel>
+
+    <!-- Profinet 帧头-->
+    <DataModel name="ProfinetFrameHeader">
+        <Number name="FrameID" size="16" endian="big"/>
+        <Number name="PayloadLength" size="16" endian="big">
+            <Relation type="size" of="UserData"/>
+        </Number>
+    </DataModel>
+
+    <!-- User Data Models -->
+    <DataModel name="UserData" ref="ProfinetFrameHeader">
+        <Choice name="ServiceType" field="ServiceID">
+            <Block name="ConnectRequest" value="0x04">
+                <Number name="ServiceID" size="8" value="0x04"/>
+            </Block>
+            <Block name="ConnectResponse" value="0x08">
+                <Number name="ServiceID" size="8" value="0x08"/>
+            </Block>
+
+            <!-- 周期数据 -->
+            <Block name="CyclicData" value="0x20">
+                <Number name="ServiceID" size="8" value="0x20"/>
+                <Number name="DataStatus" size="8" endian="big"/>
+                <Number name="TransferStatus" size="8" endian="big"/>
+                <Number name="SequenceNumber" size="16" endian="big"/>
+                <Number name="DataLength" size="16" endian="big"/>
+                <Blob name="IOData" lengthField="DataLength"/>
+            </Block>
+
+            <!-- 非周期-->
+            <Block name="AcyclicRequest" value="0x40">
+                <Number name="ServiceID" size="8" value="0x40"/>
+            </Block>
+            <Block name="AcyclicResponse" value="0x41">
+                <Number name="ServiceID" size="8" value="0x41"/>
+            </Block>
+
+            <!-- 告警 -->
+            <Block name="AlarmNotification" value="0x82">
+                <Number name="ServiceID" size="8" value="0x82"/>
+            </Block>
+
+            <!-- IRT Data-->
+            <Block name="IRTData" value="0x24">
+                <Number name="ServiceID" size="8" value="0x24"/>
+                <Number name="RedundancyInfo" size="16" endian="big"/>
+                <Number name="DataStatus" size="8" endian="big"/>
+                <Number name="TransferStatus" size="8" endian="big"/>
+                <Number name="SequenceNumber" size="16" endian="big"/>
+                <Number name="DataLength" size="16" endian="big"/>
+                <Blob name="IOData" lengthField="DataLength"/>
+            </Block>
+        </Choice>
+    </DataModel>
+
+    <!--  RT Data -->
+    <DataModel name="ProfinetRTData">
+        <Block ref="EthernetHeader"/>
+        <Block ref="ProfinetFrameHeader"/>
+        <Block ref="UserData"/>
+    </DataModel>
+
+    <StateModel name="ProfinetRTStateModel" initialState="Connecting">
+        <State name="Connecting">
+            <Action type="output">
+                <DataModel ref="ProfinetRTData">
+                    <Block ref="UserData">
+                        <Block ref="ConnectRequest"/>
+                    </Block>
+                </DataModel>
+            </Action>
+            <Action type="receive">
+                <DataModel ref="ProfinetRTData">
+                    <Block ref="UserData">
+                        <Block ref="ConnectResponse"/>
+                    </Block>
+                </DataModel>
+            </Action>
+            <Action type="changeState" ref="CyclicDataTransfer"/>
+        </State>
+
+        <State name="CyclicDataTransfer">
+            <Action type="output">
+                <DataModel ref="ProfinetRTData">
+                    <Block ref="UserData">
+                        <Block ref="CyclicData"/>
+                    </Block>
+                </DataModel>
+            </Action>
+            <Action type="delay">
+                <DataModel name="DelayModel">
+                    <Number name="DelayTimeMs" size="32" valueType="uint32"/>
+                </DataModel>
+            </Action>
+            <Action type="output">
+                <DataModel ref="ProfinetRTData">
+                    <Block ref="UserData">
+                        <Block ref="IRTData"/>
+                    </Block>
+                </DataModel>
+            </Action>
+            <Action type="delay">
+                <DataModel ref="DelayModel"/>
+            </Action>
+            <Action type="output">
+                <DataModel ref="ProfinetRTData">
+                    <Block ref="UserData">
+                        <Block ref="AcyclicRequest"/>
+                    </Block>
+                </DataModel>
+            </Action>
+            <Action type="receive">
+                <DataModel ref="ProfinetRTData">
+                    <Block ref="UserData">
+                        <Block ref="AcyclicResponse"/>
+                    </Block>
+                </DataModel>
+            </Action>
+            <Action type="output">
+                <DataModel ref="ProfinetRTData">
+                    <Block ref="UserData">
+                        <Block ref="AlarmNotification"/>
+                    </Block>
+                </DataModel>
+            </Action>
+        </State>
+    </StateModel>
+
+    <!-- Agent and Test Configuration -->
+    <Agent name="LocalAgent">
+        <Monitor name="Debugger" class="WindowsDebugEngine"/>
+    </Agent>
+
+    <Test name="ProfinetRTTest">
+        <Agent ref="LocalAgent"/>
+        <StateModel ref="ProfinetRTStateModel"/>
+        <Publisher class="RawEther"/>
+        <Strategy class="Random"/>
+    </Test>
+</Peach>

@@ -1,0 +1,30 @@
+<?xml vers<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+<DataModel name="EtherCATMessage"> // EtherCAT协议的数据模型
+<Blob name="DestiAddr" length="6" valueType="hex"/> 
+<Blob name="SourceAddr" length="6" valueType="hex"/> 
+	<Blob name="FrameType" length="2" valueType="hex"/>
+	<Blob name="Reserved" length="1" valueType="bit"/>
+<Blob name="Type" length="4" valueType="bit"/>
+<Blob name="Order" length="8" valueType="bit"/>
+<Blob name="Index" length="8" valueType="bit"/>
+<Blob name="Address" length="32" valueType="bit"/>
+<Blob name="Length" length="11" valueType="bit"/>
+<Blob name="R" length="4" valueType="bit"/>
+<Blob name="M" length="1" valueType="bit"/>
+<Blob name="State" length="16" valueType="bit"/>
+<Blob name="Data" valueType="hex"/>
+<Blob name="WKC" length="2" valueType="hex"/>
+</DataModel>
+
+<StateModel name="TheState1" initialState="initialState">
+   <State name="initialState">
+    <Action type="output">
+      <DataModel ref=" EtherCATmessage" />
+    </Action>
+		<Action type="input">
+      <DataModel ref=" EtherCATmessage" />
+    </Action>
+  </State>
+</StateModel>

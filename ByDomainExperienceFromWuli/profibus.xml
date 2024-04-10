@@ -1,0 +1,154 @@
+<Peach x
+<?xml vers<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+
+
+
+<DataModel name="fixed_len_message">
+  	<!--起始字节（Start Delimiter），用于区别不同的报文格式 -->
+		<Number name="SD1" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--目标地址字节（Destination Address），指示哪个站点接收信息 -->
+		<Number name="DA" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--源地址字节（Source Address），指示哪个站点发送信息 -->
+		<Number name="SA" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--控制字节（Frame Control），存储此报文所使用的服务细节和报文优先级 -->
+		<Number name="FC" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--检验字节（Frame Check Sequence），存储对所有报文元素的无进位的“与”运算所得的检验和 -->
+		<Number name="FCS" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--终止字节（End Delimiter），指示报文结束 -->
+		<Number name="ED" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+</DataModel>
+
+
+<DataModel name="fixed_len_message_with_data">
+  	<!--起始字节（Start Delimiter），用于区别不同的报文格式 -->
+		<Number name="SD3" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--目标地址字节（Destination Address），指示哪个站点接收信息 -->
+		<Number name="DA" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+
+		<!--源地址字节（Source Address），指示哪个站点发送信息 -->
+		<Number name="SA" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--控制字节（Frame Control），存储此报文所使用的服务细节和报文优先级 -->
+		<Number name="FC" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--数据单元（Data Unit），存储报文的有用信息和扩展地址的细节（如果可用） -->
+		<Number name="Data_Unit" length="8" value="00 00 00 00 00 00 00 00" valueType="hex" signed="false" mutable="false"/>
+		<!--检验字节（Frame Check Sequence），存储对所有报文元素的无进位的“与”运算所得的检验和 -->
+		<Number name="FCS" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--终止字节（End Delimiter），指示报文结束 -->
+		<Number name="ED" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+</DataModel>
+
+
+<DataModel name="alterable_len_message">
+  	<!--起始字节（Start Delimiter），用于区别不同的报文格式 -->
+		<Number name="SD2" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--长度字节（LEngth），指示可变长报文中的信息域长度 -->
+		<Number name="LE" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--长度字节（LEngth），指示可变长报文中的信息域长度 -->
+		<Number name="LEr" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--起始字节（Start Delimiter），用于区别不同的报文格式 -->
+		<Number name="SD2" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--目标地址字节（Destination Address），指示哪个站点接收信息 -->
+		<Number name="DA" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--源地址字节（Source Address），指示哪个站点发送信息 -->
+		<Number name="SA" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--控制字节（Frame Control），存储此报文所使用的服务细节和报文优先级 -->
+		<Number name="FC" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--数据单元（Data Unit），存储报文的有用信息和扩展地址的细节（如果可用） ，长度可变，范围0~245字节-->
+		<Number name="Data_Unit" valueType="hex" mutable="false"/>
+		<!--检验字节（Frame Check Sequence），存储对所有报文元素的无进位的“与”运算所得的检验和 -->
+		<Number name="FCS" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--终止字节（End Delimiter），指示报文结束 -->
+		<Number name="ED" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+</DataModel>
+
+
+<DataModel name="token_message">
+		<!--起始字节（Start Delimiter），用于区别不同的报文格式 -->
+		<Number name="SD4" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--目标地址字节（Destination Address），指示哪个站点接收信息 -->
+		<Number name="DA" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+		<!--源地址字节（Source Address），指示哪个站点发送信息 -->
+		<Number name="SA" size="8" value="00" valueType="hex" signed="false" mutable="false"/>
+</DataModel>
+
+<DataModel name="short_response"> 
+		<!--单字符（Single Character），仅用于应答 -->
+		<Blob name="SC" size="1" />
+</DataModel>
+
+
+<StateModel name="TheState" initialState="initialState">
+		<State name="initialState">
+				<Action type="output">
+						<DataModel ref="fixed_len_message" />
+				</Action>
+				<Action type="input">
+						<DataModel ref="fixed_len_message_with_data" />
+				</Action>
+				<Action type="output">
+						<DataModel ref="alterable_len_message" />
+				</Action>
+				<Action type="input">
+						<DataModel ref="short_response" />
+				</Action>
+				<Action type="output">
+						<DataModel ref="alterable_len_message" />
+				</Action>
+				<Action type="input">
+						<DataModel ref="short_response" />
+				</Action>
+				<Action type="output">
+						<DataModel ref="fixed_len_message" />
+				</Action>
+				<Action type="input">
+						<DataModel ref="fixed_len_message_with_data" />
+				</Action>
+		</State>
+
+		<State name="Data_Communication">
+				<Action type="output">
+						<DataModel ref="fixed_len_message" />
+				</Action>
+				<Action type="input">
+						<DataModel ref="fixed_len_message_with_data" />
+				</Action>
+		</State>
+
+		<State name="Diag_Interrupt">
+				<Action type="output">
+						<DataModel ref="fixed_len_message" />
+				</Action>
+				<Action type="input">
+						<DataModel ref="fixed_len_message_with_data" />
+				</Action>
+				<Action type="output">
+						<DataModel ref="fixed_len_message" />
+				</Action>
+				<Action type="input">
+						<DataModel ref="fixed_len_message_with_data" />
+				</Action>
+		</State>
+</StateModel>
+
+<!--使用socket进行监听端口 -->
+<Agent name="Local">
+		<Monitor class="Socket">
+				<Param name="Host" value="127.0.0.1" />
+				<Param name="port" value="502" />
+		</Monitor>
+</Agent>
+<!--log保存-->
+<Test name="Default">
+		<Agent ref="Local" />
+				<StateModel ref="TheState" />
+						<Logger class="File">
+								<Param name="Path" value="C:\peach\logs" />
+						</Logger>
+						<Publisher class="tcp.Tcp">
+								<Param name="Host" value="127.0.0.1" />
+								<Param name="Port" value="502" /> 
+						</Publisher>
+</Test>
+</Peach>

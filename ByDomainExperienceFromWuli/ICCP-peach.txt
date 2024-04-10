@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach>
+  <DataModel name="ICCP">
+    <Blob name="StartChar" value="0x68" token="true"/>
+    <Number name="Length" size="8" valueType="uint8">
+      <Relation type="size" of="UserData"/>
+    </Number>
+    <Number name="MsgType" size="8" valueType="uint8"/>
+    <Number name="OriginatorID" size="16" valueType="uint16" endian="big"/>
+    <Number name="ReceiverID" size="16" valueType="uint16" endian="big"/>
+    <Blob name="UserData" lengthField="Length">
+      <Hint path="UserData" kind="XML"/>
+    </Blob>
+    <Number name="Checksum" size="8" valueType="uint8"/>
+  </DataModel>
+
+  <DataModel name="UserData" ref="ICCP">
+    <Choice name="PayloadType" field="MsgType">
+      <!-- 连接建立请求报文 -->
+      <Block name="ConnectRequest" value="0x01">
+        <Number name="VersionNumber" size="8" valueType="uint8"/>
+        <Number name="VersionRevision" size="8" valueType="uint8"/>
+        <String name="OriginatorName" lengthField="OriginatorNameLength">
+          <Number name="OriginatorNameLength" size="8" valueType="uint8"/>
+        </String>
+        <Number name="TransferServiceOptions" size="8" valueType="uint8"/>
+        <Number name="MaxDatapointsPerResponse" size="16" valueType="uint16" endian="big"/>
+      </Block>
+
+      <!-- 连接建立响应报文 -->
+      <Block name="ConnectResponse" value="0x02">
+        <Number name="Result" size="8" valueType="uint8"/>
+        <Number name="TransferServiceOptions" size="8" valueType="uint8"/>
+        <Number name="MaxDatapointsPerResponse" size="16" valueType="uint16" endian="big"/>
+      </Block>
+
+      <!-- 实时数据传输报文 -->
+      <Block name="RealTimeData" value="0x10">
+        <Number name="TransferService" size="8" valueType="uint8"/>
+        <BlockDefinition name="DataPoint">
+          <Number name="DataType" size="8" valueType="uint8"/>
+          <Number name="Length" size="16" valueType="uint16" endian="big"/>
+          <Blob name="Data" lengthField="Length"/>
+        </BlockDefinition>
+        <List name="DataPoints" blockDefinition="DataPoint"/>
+      </Block>
+
+      <!-- 传输能力请求/响应 -->
+      <Block name="TransferCapabilityRequest" value="0x20"/>
+      <Block name="TransferCapabilityResponse" value="0x21">
+        <Number name="MaxDatapointsPerResponse" size="16" valueType="uint16" endian="big"/>
+        <Blob name="TransferCapabilities"/>
+      </Block>
+
+      <!-- 请求 -->
+      <Block name="RequestTransfer" value="0x30">
+        <Number name="TransferServiceType" size="8" valueType="uint8"/>
+        <Blob name="TransferRequests"/>
+      </Block>
+
+      <!-- 响应 -->
+      <Block name="ResponseTransfer" value="0x31">
+        <Number name="TransferService" size="8" valueType="uint8"/>
+        <BlockDefinition name="DataPoint">
+          <Number name="DataType" size="8" valueType="uint8"/>  
+          <Number name="Length" size="16" valueType="uint16" endian="big"/>
+          <Blob name="Data" lengthField="Length"/>
+        </BlockDefinition>
+        <List name="DataPoints" blockDefinition="DataPoint"/>
+      </Block>
+    </Choice>
+  </DataModel>
+</Peach>

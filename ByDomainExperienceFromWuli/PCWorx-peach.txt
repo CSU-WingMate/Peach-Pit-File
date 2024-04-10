@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach>
+  <DataModel name="EthernetFrame">
+    <Block name="EthernetHeader">
+      <Blob name="DestMAC" length="6" valueType="hex"/>
+      <Blob name="SrcMAC" length="6" valueType="hex"/>
+      <Number name="EtherType" size="16" endian="big" value="0x0800"/> <!-- IPv4 -->
+    </Block>
+    <Block name="IPHeader">
+      <Number name="IPVersion" size="4" value="4"/>
+      <Number name="IPHeaderLen" size="4" value="5"/> 
+      <Number name="IPServiceType" size="8" value="0"/>
+      <Number name="IPTotalLen" size="16"/>
+      <Number name="IPID" size="16"/>
+      <Number name="IPFlags" size="3" value="2"/> 
+      <Number name="IPFragOffset" size="13" value="0"/>
+      <Number name="IPTTL" size="8" value="64"/>
+      <Number name="IPProtocol" size="8" value="17"/>
+      <Number name="IPChecksum" size="16" value="0"/>
+      <Blob name="IPSrcAddr" length="4" valueType="hex"/>
+      <Blob name="IPDestAddr" length="4" valueType="hex"/>
+    </Block>
+    <Block name="UDPHeader">
+      <Number name="UDPSrcPort" size="16" value="61451"/>
+      <Number name="UDPDestPort" size="16" value="61451"/>
+      <Number name="UDPLen" size="16"/>
+      <Number name="UDPChecksum" size="16" value="0"/>
+    </Block>
+  </DataModel>
+  
+  <DataModel name="PCWorx">
+    <Block name="PCWorxMessage">
+      <Number name="PCWorxLen" size="16" endian="little"/>
+      <Number name="MsgType" size="8" endian="little"/>
+      <Number name="Version" size="8" endian="little" value="9"/>
+      <Number name="UDPLen" size="16" endian="little"/>
+      <Blob name="ProducerID" length="6" valueType="hex"/>
+      <Blob name="ProductGUID" length="16" valueType="hex"/>
+      <Blob name="InstanceGUID" length="16" valueType="hex"/>
+      <Number name="DataLen" size="32" endian="little"/>
+      <Blob name="Data" length="DataLen"/>
+      <Blob name="FCS" length="4" valueType="hex"/>
+    </Block>
+  </DataModel>
+
+  <StateModel name="PCWorxComm" initialState="Discovery">
+    <State name="Discovery">
+      <Action type="output">
+        <DataModel ref="EthernetFrame"/>
+        <DataModel ref="PCWorx"/>
+        <Data>
+          <DestMAC>01:00:5E:00:00:FB</DestMAC>
+          <IPSrcAddr>192.168.1.100</IPSrcAddr>
+          <IPDestAddr>239.192.1.1</IPDestAddr>
+          <MsgType>1</MsgType> <!-- 生产者消息 -->
+        </Data>
+      </Action>
+      <Action type="input">
+        <DataModel ref="EthernetFrame"/>
+        <DataModel ref="PCWorx"/>
+        <Data>
+          <MsgType>2</MsgType> <!-- 消费者注册 -->
+        </Data>
+      </Action>
+      <Action type="delay" factor="2"/>
+    </State>
+
+    <State name="DataExchange">
+      <Action type="output">
+        <DataModel ref="EthernetFrame"/>
+        <DataModel ref="PCWorx"/>
+        <Data>
+          <DestMAC>01:00:5E:00:00:FB</DestMAC>
+          <IPSrcAddr>192.168.1.100</IPSrcAddr>
+          <IPDestAddr>239.192.1.1</IPDestAddr>
+          <MsgType>3</MsgType> <!-- 周期数据 -->
+        </Data>
+      </Action>
+      <Action type="input">
+        <DataModel ref="EthernetFrame"/>
+        <DataModel ref="PCWorx"/>
+        <Data>
+          <MsgType>6</MsgType> <!-- 质量信息查询 -->
+        </Data>
+      </Action>
+      <Action type="output">
+        <DataModel ref="EthernetFrame"/>
+        <DataModel ref="PCWorx"/>
+        <Data>
+          <DestMAC>01:00:5E:00:00:FB</DestMAC>
+          <IPSrcAddr>192.168.1.100</IPSrcAddr>
+          <IPDestAddr>239.192.1.1</IPDestAddr>
+          <MsgType>7</MsgType> <!-- QualityOfServiceResponse -->
+        </Data>
+      </Action>
+      <Action type="delay" factor="2"/>
+    </State>
+
+    <State name="Redundancy">
+      <Action type="output">
+        <DataModel ref="EthernetFrame"/>
+        <DataModel ref="PCWorx"/>
+        <Data>
+          <MsgType>4</MsgType> <!-- 冗余备份请求 -->
+        </Data>
+      </Action>
+      <Action type="input">
+        <DataModel ref="EthernetFrame"/>
+        <DataModel ref="PCWorx"/>
+        <Data>
+          <MsgType>5</MsgType> <!-- 冗余备份响应-->
+        </Data>
+      </Action>
+    </State>
+
+    <StateModel ref="Discovery"/>
+  </StateModel>
+</Peach>

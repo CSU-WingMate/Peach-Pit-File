@@ -1,0 +1,24 @@
+<?xml vers<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+<DataModel name="EGDMessage"> // EtherCAT协议的数据模型
+<Blob name="PDUVersionType" length="2" valueType="hex"/> 
+<Blob name="ProducerID" length="4" valueType="hex"/> 
+	<Blob name="ExchangeID" length="4" valueType="hex"/>
+	<Blob name="TimeStamp" length="8" valueType="hex"/>
+<Blob name="Status" length="4" valueType="hex"/>
+<Blob name="ConfigSignature" length="4" valueType="hex"/>
+<Blob name="Reserved" length="4" valueType="hex"/>
+<Blob name="Data" valueType="hex"/>
+</DataModel>
+
+<StateModel name="TheState1" initialState="initialState">
+   <State name="initialState">
+    <Action type="output">
+      <DataModel ref=" EGDMessage" />
+    </Action>
+		<Action type="input">
+      <DataModel ref=" EGDMessage" />
+    </Action>
+  </State>
+</StateModel>

@@ -1,0 +1,97 @@
+<?xml vers<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+<DataModel name="BACnet/ipMessage"> // BACnet/IP协议的数据模型
+<Blob name="BVLC Type" length="1" valueType="hex"/> 
+<Blob name="BVLC Function" length="1" valueType="hex"/> 
+	<Number size="16" signed="false" name="Length" valueType="hex" > 
+			<Relation type="size" of="BVLC Type"+"BVLC Function"+"Length"/>
+	</Number>   
+	<Blob name="Version" length="1" valueType="hex"/>
+	<Blob name="Control" length="1" valueType="hex"/> 
+	<Blob name="TargetNetworkID" length="2" vlaueType="hex"/>
+	<Number size="8" signed="false" name="TargetMACLength" valueType="hex" > 
+			<Relation type="size" of="TargetMAC"/>
+	</Number>  
+<Blob name="TargetMAC" vlaueType="hex"/>
+<Blob name="SourceNetworkID" length="2" vlaueType="hex"/>
+	<Number size="8" signed="false" name="SourceMACLength" valueType="hex" > 
+			<Relation type="size" of="SourceMAC"/>
+	</Number>  
+<Blob name="SourceMAC" vlaueType="hex"/>
+<Blob name="HopCount" length="1" valueType="hex"/>
+<Blob name="MessageType" length="1" valueType="hex"/>
+<Blob name="VendorID" length="2" valueType="hex"/>
+<Blob name="PDU Type" length="4" valueType="bit"/>
+<Blob name="Segmented Flag" length="1" valueType="bit"/>
+<Blob name="More segments Flag" length="1" valueType="bit"/>
+<Blob name="Segment accepted Flag" length="1" valueType="bit"/>
+<Blob name="Reserved" length="2" valueType="bit"/>
+<Blob name="Maximum Segment" length="3" valueType="bit"/>
+<Blob name="Maximum APDU Length" length="1" valueType="Hex"/>
+<Blob name="Invoke ID" length="1" valueType="Hex"/>
+<Blob name="Sequence Number" length="1" valueType="Hex"/>
+<Blob name="Service Choice" length="1" valueType="Hex"/>
+<Blob name="Service Request" valueType="bit"/>
+
+</DataModel>
+
+ <StateModel name="TheState" initialState="initialState">
+   <State name="initialState">
+    <Action type="output">
+      <DataModel ref=" BACnet/ipMessage" />
+    </Action>
+	<Action type="input">
+      <DataModel ref=" BACnet/ipMessage" />
+    </Action>
+
+	<Action type="changeState" ref="finalState" when="int(StateModel.states['InitialState'].actions[0].dataModel['PDU Type'].InternalValue) == 0"/>
+
+  </State>
+
+   <State name="finalState">
+    <Action type="output">
+      <DataModel ref=" BACnet/ipMessage" />
+    </Action>
+	<Action type="input">
+      <DataModel ref=" BACnet/ipMessage" />
+    </Action>
+
+<Action type="changeState" ref="initialState" when="int(StateModel.states['finalState'].actions[0].dataModel['PDU Type'].InternalValue) != 0"/>
+
+  </State>
+
+ </StateModel>
+
+<StateModel name="TheState1" initialState="initialState">
+   <State name="initialState">
+    <Action type="output">
+      <DataModel ref=" BACnet/ipMessage" />
+    </Action>
+  </State>
+</StateModel>
+
+
+ <!--使用socket进行监听端口 -->
+ <Agent name="Local">
+  <Monitor class="Socket">
+   <Param name="Host" value="127.0.0.1" />
+   <Param name="port" value="502" />
+  </Monitor>
+ </Agent>
+
+ <!--log保存-->
+ <Test name="Default">
+  <Agent ref="Local" />
+  <StateModel ref="TheState" />
+  <Logger class="File">
+   <Param name="Path" value="C:\peach\logs" />
+  </Logger>
+
+  <Publisher class="tcp.Tcp">
+   <Param name="Host" value="127.0.0.1" />
+   <Param name="Port" value="502" /> 
+  </Publisher>
+
+ </Test>
+</Peach>

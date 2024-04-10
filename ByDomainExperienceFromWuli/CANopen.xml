@@ -1,0 +1,72 @@
+<DataModel name="CANopenframe"> // CANopen协议的数据帧
+<Number size="1" signed="false" name="SOF" valueType="hex">//帧起始
+<Block name="Identifier">
+<Number size="4" signed="false" name="Functioncode" valueType="hex">
+<Number size="7" signed="false" name="Nodeid" valueType="hex">
+</Block>
+<Number size="6" signed="false" name="Control" valueType="hex">//控制段
+<Block name="Data ">
+<Blob name="Data"  valueType="hex"> //长度不确定
+</Block>
+<Number size="16" signed="false" name="CRC" valueType="hex">//CRC段
+<Number size="2" signed="false" name="ACK" valueType="hex">//ACK段
+<Number size="7" signed="false" name="EOF" valueType="hex">//帧结束段
+</DataModel>
+<DataModel name="CANRemoteframe"> // CAN协议的遥控帧
+<Number size="1" signed="false" name="SOF" valueType="hex">//帧起始
+<Number size="12" signed="false" name="Identifier" valueType="hex">//仲裁段
+<Number size="6" signed="false" name="Control" valueType="hex">//控制段
+<Number size="16" signed="false" name="CRC" valueType="hex">//CRC段
+<Number size="2" signed="false" name="ACK" valueType="hex">//ACK段
+<Number size="7" signed="false" name="EOF" valueType="hex">//帧结束段
+</DataModel>
+<StateModel name="TheState" initialState="initialState">
+<State name="initialState">
+<Action type="output">
+<DataModel ref=" CANopenframe" />
+</Action>
+<Action type="input">
+<DataModel ref=" CANopenframe" />
+</Action>
+</State>
+</StateModel>
+<StateModel name="TheState" initialState="initialState">
+<State name="initialState">
+<Action type="output">
+<DataModel ref="CANopenframe" />
+</Action>
+<Action type="input">
+<DataModel ref=" CANRemoteframe " />
+</Action>
+<Action type="output">
+<DataModel ref="CANopenframe" />
+</Action>
+</State>
+</StateModel>
+<StateModel name="TheState" initialState="initialState">
+<State name="initialState">
+<Action type="output">
+<DataModel ref="CANopenframe" />
+</Action>
+<Action type="input">
+<DataModel ref=" CANRemoteframe " />
+</Action>
+<Action type="output">
+<DataModel ref="CANopenframe" />
+</Action>
+</State>
+</StateModel>
+<StateModel name="TheState" initialState="initialState">
+<State name="initialState">
+<Action type="output">
+<DataModel ref="CANopenframe" />
+</Action>
+</State>
+</StateModel>
+<StateModel name="TheState" initialState="initialState">
+<State name="initialState">
+<Action type="output">
+<DataModel ref="CANopenframe" />
+</Action>
+</State>
+</StateModel>
